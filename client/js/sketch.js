@@ -1,5 +1,8 @@
+let game = new Game(name);
+
 function setup() {
-  createCanvas(800, 600);
+  let canvas = createCanvas(800, 600);
+  canvas.parent('main');
   console.log(game.playerName);
 }
 
