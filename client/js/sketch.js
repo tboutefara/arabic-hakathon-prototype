@@ -1,7 +1,6 @@
-let game = new Game("Ahmed");
-
 function setup() {
   createCanvas(800, 600);
+  console.log(game.playerName);
 }
 
 function draw() {

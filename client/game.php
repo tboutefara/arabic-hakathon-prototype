@@ -14,6 +14,9 @@
     }
   </style>
   <script src="./js/game.js"></script>
+  <script>
+  	  let game = new Game("<?php echo $_GET["name"]; ?>");
+  </script>
   <script src="./js/p5.min.js"></script>
   <script src="./js/sketch.js"></script>
 </head>
