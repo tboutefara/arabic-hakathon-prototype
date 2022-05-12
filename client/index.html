@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كلماتي سيارتي</title>
+  <style>
+    .main {
+    	width: 800px;
+    	height: 600px;
+    	padding: 0;
+    	margin-left: auto;
+    	margin-right: auto;
+    	background-image: URL("./img/cover.png");
+    	background-repeat: no-repeat;
+		background-size: cover, contain;
+		background-position: center center;
+		text-align: center;
+    }
+    
+    .title{
+    	display: block;
+    	padding-top: 100px;
+    	font: bold 96px Arial, sans-serif;
+    	color: white;
+    }
+    
+    .name{
+    	margin-top: 100px;
+    	font: bold 36px Arial, sans-serif;
+    	text-align: center;
+    }
+    
+    .start{
+    	margin-top: 50px;
+    	font: bold 24px Arial, sans-serif;
+    	padding: 20px;
+    	background-color: #4DA6FF;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main">
+  	<div class="title">كلماتي سيارتي</div>
+  	<input type="text" id="name" class="name" placeholder="إسم اللاعب"/><br/>
+  	<button onclick="startGame()" class="start">إبدء اللعبة</button>
+  </div>
+  <script>
+  	function startGame(){
+  		let name = document.getElementById("name").value;
+  		window.location.assign("./game.php?name=" + name);
+  	}
+  </script>
+</body>
+
+</html>
