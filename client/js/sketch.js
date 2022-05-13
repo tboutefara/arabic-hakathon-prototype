@@ -77,7 +77,7 @@ function prepareFirstScene(){
 	
 	for(var i = 0; i < 3; i++){
 		for(var j = 0; j < 3; j++){
-			wordsx[3 * i + j] = x + random(200) + j * 200;
+			wordsx[3 * i + j] = x + random(150) + j * 200;
 			wordsy[3 * i + j] = y + random(50);
 		}
 		x = 100;
