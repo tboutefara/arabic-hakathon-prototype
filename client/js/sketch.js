@@ -2,10 +2,44 @@ let game = new Game(name);
 let bubble;
 
 let categories = ["علوم الحاسب", "علوم الطبيعة", "حياة يومية", "تاريخ", "جغرافيا", "ثقافة", "العمل", "أسفار وسياحة", "رياضة"];
+let chosenCategory = "";
 let words = ["تشغيل", "أمر", "لغة", "طور", "موقع", "تصفح", "برنامج", "مكتب", "معالجة"];
-let wordsx = [];
-let wordsy = [];
+let chosenWord = "";
+
+let questions = [
+  {
+    "question": "السؤال الأول",
+    "choices": [
+      "الخيار الأول",
+      "الخيار الثاني",
+      "الخيار الثالث"
+    ],
+    "answer": 1
+  },
+  {
+    "question": "السؤال الثاني",
+    "choices": [
+      "الخيار الأول",
+      "الخيار الثاني",
+      "الخيار الثالث"
+    ],
+    "answer": 0
+  },
+  {
+    "question": "السؤال الثالث",
+    "choices": [
+      "الخيار الأول",
+      "الخيار الثاني",
+      "الخيار الثالث"
+    ],
+    "answer": 2
+  }
+];
+
+let wordsxy = [];
 let buttons = [];
+let questionxy = [];
+let currentQuestion = 0;
 
 
 function preload(){
@@ -15,17 +49,38 @@ function preload(){
 function setup() {
   let canvas = createCanvas(800, 600);
   canvas.parent('main');
-  noLoop();
 }
 
 function draw() {
   if(game.scene == 0){
-  	  drawStartScene();
+  	  prepareStartScene();
   }else if(game.scene == 1){
-  	  prepareFirstScene();
+  	  drawStartScene();
   }else if(game.scene == 2){
+  	  prepareFirstScene();
+  }else if(game.scene == 3){
   	  drawFirstScene();
+  }else if(game.scene == 4){
+  	  prepareSecondScene();
+  }else if(game.scene == 5){
+  	  drawSecondScene();
   }
+}
+
+function prepareStartScene(){
+	var x = 30;
+	var y = 300;
+	
+	for(var i = 0; i < 3; i++){
+		for(var j = 0; j < 3; j++){
+			buttons.push({"x" : x, "y" : y});
+			x += 256;
+		}
+		y += 100;
+		x = 30;
+	}
+	
+	game.scene = 1;
 }
 
 function drawStartScene(){
@@ -46,46 +101,36 @@ function drawStartScene(){
 function createButtons(){
 	var x = 30;
 	var y = 300;
+	
+	textSize(18);
+	textAlign(CENTER);
+	
 	for(var i = 0; i < 3; i++){
 		for(var j = 0; j < 3; j++){
-			let b = createButton(categories[3 * i + j]);
-			b.position(x, y);
-			b.size(226, 90);
-			b.parent('main');
-			b.mouseClicked(function(){
-				game.scene = 1;
-				loop();
-			});
+			rect(x, y, 226, 90);
+			text(categories[3 * i + j], x + 226/2, y + 90/2);
 			
 			x += 256;
-			buttons.push(b);
 		}
 		y += 100;
 		x = 30;
 	}	
-	
-	console.log(buttons);
 }
 
 function prepareFirstScene(){
-	buttons.forEach(function(item){
-		item.remove();
-	});
-	
 	let x = 100;
 	let y = 610;
 	
 	for(var i = 0; i < 3; i++){
 		for(var j = 0; j < 3; j++){
-			wordsx[3 * i + j] = x + random(150) + j * 200;
-			wordsy[3 * i + j] = y + random(50);
+			wordsxy[3 * i + j] = {x : x + random(150) + j * 200, y : y + random(50)};
 		}
 		x = 100;
 		y += 200;
 	}
 	
 	frameRate(12);
-	game.scene = 2;
+	game.scene = 3;
 }
 
 function drawFirstScene(){
@@ -101,11 +146,78 @@ function drawFirstScene(){
 	
 	for(var i = 0; i < 3; i++){
 		for(var j = 0; j < 3; j++){
-			text(words[3 * i + j], wordsx[3 * i + j], wordsy[3 * i + j]);
-			image(bubble, wordsx[3 * i + j], wordsy[3 * i + j] - 10, 120, 120);
+			text(words[3 * i + j], wordsxy[3 * i + j].x, wordsxy[3 * i + j].y);
+			image(bubble, wordsxy[3 * i + j].x, wordsxy[3 * i + j].y - 10, 120, 120);
 			
-			wordsy[3 * i + j] -= 5;
+			wordsxy[3 * i + j].y -= 5;
+		}
+	}
+}
+
+function prepareSecondScene(){
+	game.scene = 5;
+}
+
+function drawSecondScene(){
+	background(255);
+	
+	// Creating title
+	textSize(72);
+	textAlign(CENTER);
+	text("التحضير للسباق", 400, 100);
+	
+	textSize(48);
+	textAlign(CENTER);
+	text(chosenWord, 400, 175);	
+}
+
+function mouseClicked(){
+	console.log("clicked " + mouseX + "  " + mouseY);
+	if(game.scene == 1){
+		choseACategory();
+	}else if(game.scene == 3){
+		choseAWord();
+	}else if(game.scene == 5){
+		answerAQuestion();
+	}
+}
+
+function choseACategory(){
+	var choice = -1;
+	var choiceFound = false;
+	var i = 0;
+	
+	while(!choiceFound && i < buttons.size()){
+		if(mouseX > buttons[i].x && mouseX < buttons[i].x + 226 
+		&& mouseY > buttons[i].y && mouseY < buttons[i].y + 90){
+			choice = i;
+			choiceFound = true;
+		}else{
+			i++;
 		}
 	}
 	
+	if(choice != -1){
+		game.scene = 2;
+	}
+}
+
+function choseAWord(){
+	var choice = -1;
+	var choiceFound = false;
+	var i = 0;
+	
+	while(!choiceFound && i < words.size()){
+		if(mouseX > wordsxy[i].x - 40 && mouseX < wordsxy[i].x + 40 
+		&& mouseY > wordsxy[i].y - 40 && mouseY < wordsxy[i].y + 40){
+			choice = i;
+			choiceFound = true;
+		}else{
+			i++;
+		}
+	}
+	
+	if(choice != -1){
+		game.scene = 4;
+	}
 }
