@@ -187,7 +187,7 @@ function choseACategory(){
 	var choiceFound = false;
 	var i = 0;
 	
-	while(!choiceFound && i < buttons.size()){
+	while(!choiceFound && i < buttons.length){
 		if(mouseX > buttons[i].x && mouseX < buttons[i].x + 226 
 		&& mouseY > buttons[i].y && mouseY < buttons[i].y + 90){
 			choice = i;
@@ -207,7 +207,7 @@ function choseAWord(){
 	var choiceFound = false;
 	var i = 0;
 	
-	while(!choiceFound && i < words.size()){
+	while(!choiceFound && i < words.length){
 		if(mouseX > wordsxy[i].x - 40 && mouseX < wordsxy[i].x + 40 
 		&& mouseY > wordsxy[i].y - 40 && mouseY < wordsxy[i].y + 40){
 			choice = i;
