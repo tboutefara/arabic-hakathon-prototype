@@ -6,6 +6,7 @@ let categories = ["علوم الحاسب", "علوم الطبيعة", "حياة 
 let chosenCategory = "";
 let words = ["تشغيل", "أمر", "لغة", "طور", "موقع", "تصفح", "برنامج", "مكتب", "معالجة"];
 let chosenWord = "";
+	
 
 let questions = [
   {
@@ -70,6 +71,12 @@ function draw() {
   	  prepareSecondScene();
   }else if(game.scene == 5){
   	  drawSecondScene();
+  }else if(game.scene == 6){
+  	  prepareThirdScene();
+  }else if(game.scene == 7){
+  	  drawThirdScene();
+  }else {
+  	  game.scene = 1;
   }
 }
 
@@ -198,6 +205,17 @@ function drawSecondScene(){
 	textAlign(CENTER);
 	text(questions[currentQuestion].question, questionxy[0].x, questionxy[0].y);
 	
+	stroke(0, 50, 255);
+	strokeWeight(4);
+	for(var i = 0; i < 3; i++){
+		if(mouseX > questionxy[i + 1].x - 100 && mouseX < questionxy[i + 1].x + 100 
+		&& mouseY > questionxy[i + 1].y - 40 && mouseY < questionxy[i + 1].y){
+			rect(questionxy[i + 1].x - 100, questionxy[i + 1].y - 30, 200, 50); // The added or subbed values are to align
+		}
+	}
+	stroke(0);
+	strokeWeight(0);
+	
 	textSize(24);
 	textAlign(CENTER);
 	for(var i = 0; i < 3; i++){
@@ -214,6 +232,14 @@ function drawSecondScene(){
 	for(var i = 0; i < 6; i++){
 		image(cars[i], carxy[i].x, carxy[i].y, 100, 60);
 	}
+	
+}
+
+function prepareThirdScene(){
+	
+}
+
+function drawThirdScene(){
 }
 
 function mouseClicked(){
@@ -290,5 +316,9 @@ function answerAQuestion(){
 			currentCar = currentCar == 0 ? 0 : currentCar - 1;
 		}
 		currentQuestion++;
+		
+		if(currentQuestion == questions.length){
+			game.scene = 6;
+		}
 	}
 }
