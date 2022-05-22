@@ -1,6 +1,11 @@
 let game = new Game(name);
 let bubble;
 let cars = [];
+let tree;
+let road;
+let cloud;
+
+let aiName = "لاعب الذكاء الصناعي";
 
 let categories = ["علوم الحاسب", "علوم الطبيعة", "حياة يومية", "تاريخ", "جغرافيا", "ثقافة", "العمل", "أسفار وسياحة", "رياضة"];
 let chosenCategory = "";
@@ -44,6 +49,10 @@ let questionxy = [];
 let carxy = [];
 let currentQuestion = 0;
 let currentCar = 0;
+let playerCarX = 20;
+let playerCarSpeed = 10;
+let aiCarX = 50;
+let aiCarSpeed = 10;
 
 
 function preload(){
@@ -51,6 +60,9 @@ function preload(){
 	for(var i = 1; i < 7; i++){
 		cars[i - 1] = loadImage('../img/car0' + i + '.png');
 	}
+	cloud = loadImage('../img/cloud.jpg');
+	road = loadImage('../img/road.png');
+	tree = loadImage('../img/tree.jpg');
 }
 
 function setup() {
@@ -236,10 +248,35 @@ function drawSecondScene(){
 }
 
 function prepareThirdScene(){
-	
+	game.scene = 7;
 }
 
 function drawThirdScene(){
+	background(255);
+	
+	textSize(72);
+	textAlign(CENTER);
+	text("بدء السباق", 400, 100);
+	
+	image(cloud, 20, 130, 360, 240);
+	image(cloud, 420, 130, 360, 240);
+	
+	textSize(14);
+	text(game.playerName, 200, 130);
+	text(aiName, 600, 130);
+	
+	var treeX = 15; // Just to align, no math behind
+	for(var i = 0; i < 8; i++){
+		image(tree, treeX, 475, 100, 55);
+		treeX += 100;
+	}
+	image(road, 0, 530, 800, 50);
+	
+	image(cars[0], aiCarX, 490, 100, 60);
+	image(cars[currentCar], playerCarX, 510, 100, 60);
+	
+	aiCarX = aiCarX >= 720 ? aiCarX : aiCarX + aiCarSpeed;
+	playerCarX = playerCarX >= 690 ? playerCarX : playerCarX + playerCarSpeed;
 }
 
 function mouseClicked(){
