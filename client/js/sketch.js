@@ -5,44 +5,6 @@ let tree;
 let road;
 let cloud;
 
-let aiName = "لاعب الذكاء الصناعي";
-
-let categories = ["علوم الحاسب", "علوم الطبيعة", "حياة يومية", "تاريخ", "جغرافيا", "ثقافة", "العمل", "أسفار وسياحة", "رياضة"];
-let chosenCategory = "";
-let words = ["تشغيل", "أمر", "لغة", "طور", "موقع", "تصفح", "برنامج", "مكتب", "معالجة"];
-let chosenWord = "";
-	
-
-let questions = [
-  {
-    "question": "السؤال الأول",
-    "choices": [
-      "الخيار الأول",
-      "الخيار الثاني",
-      "الخيار الثالث"
-    ],
-    "answer": 1
-  },
-  {
-    "question": "السؤال الثاني",
-    "choices": [
-      "الخيار الأول",
-      "الخيار الثاني",
-      "الخيار الثالث"
-    ],
-    "answer": 0
-  },
-  {
-    "question": "السؤال الثالث",
-    "choices": [
-      "الخيار الأول",
-      "الخيار الثاني",
-      "الخيار الثالث"
-    ],
-    "answer": 2
-  }
-];
-
 let wordsxy = [];
 let buttons = [];
 let questionxy = [];
@@ -105,6 +67,7 @@ function prepareStartScene(){
 		x = 30;
 	}
 	
+	loadCategories(game);
 	game.scene = 1;
 }
 
@@ -133,7 +96,7 @@ function createButtons(){
 	for(var i = 0; i < 3; i++){
 		for(var j = 0; j < 3; j++){
 			rect(x, y, 226, 90);
-			text(categories[3 * i + j], x + 226/2, y + 90/2);
+			text(game.categories[3 * i + j], x + 226/2, y + 90/2);
 			
 			x += 256;
 		}
@@ -155,6 +118,7 @@ function prepareFirstScene(){
 	}
 	
 	frameRate(12);
+	loadWords(game);
 	game.scene = 3;
 }
 
@@ -171,7 +135,7 @@ function drawFirstScene(){
 	
 	for(var i = 0; i < 3; i++){
 		for(var j = 0; j < 3; j++){
-			text(words[3 * i + j], wordsxy[3 * i + j].x, wordsxy[3 * i + j].y);
+			text(game.words[3 * i + j], wordsxy[3 * i + j].x, wordsxy[3 * i + j].y);
 			image(bubble, wordsxy[3 * i + j].x, wordsxy[3 * i + j].y - 10, 120, 120);
 			
 			wordsxy[3 * i + j].y -= 5;
@@ -198,6 +162,7 @@ function prepareSecondScene(){
 		x += 130;
 	}
 	
+	loadQuestions(game);
 	game.scene = 5;
 }
 
@@ -211,11 +176,11 @@ function drawSecondScene(){
 	
 	textSize(48);
 	textAlign(CENTER);
-	text(chosenWord, 400, 175);	
+	text(game.chosenWord, 400, 175);	
 	
 	textSize(28);
 	textAlign(CENTER);
-	text(questions[currentQuestion].question, questionxy[0].x, questionxy[0].y);
+	text(game.questions[currentQuestion].question, questionxy[0].x, questionxy[0].y);
 	
 	stroke(0, 50, 255);
 	strokeWeight(4);
@@ -231,7 +196,7 @@ function drawSecondScene(){
 	textSize(24);
 	textAlign(CENTER);
 	for(var i = 0; i < 3; i++){
-		text(questions[currentQuestion].choices[i], questionxy[i + 1].x, questionxy[i + 1].y);
+		text(game.questions[currentQuestion].choices[i], questionxy[i + 1].x, questionxy[i + 1].y);
 	}
 	
 	stroke(0, 255, 50);
@@ -263,7 +228,7 @@ function drawThirdScene(){
 	
 	textSize(14);
 	text(game.playerName, 200, 130);
-	text(aiName, 600, 130);
+	text(game.aiName, 600, 130);
 	
 	var treeX = 15; // Just to align, no math behind
 	for(var i = 0; i < 8; i++){
@@ -280,7 +245,6 @@ function drawThirdScene(){
 }
 
 function mouseClicked(){
-	console.log("clicked " + mouseX + "  " + mouseY);
 	if(game.scene == 1){
 		chooseACategory();
 	}else if(game.scene == 3){
@@ -307,6 +271,7 @@ function chooseACategory(){
 	
 	if(choice != -1){
 		game.scene = 2;
+		game.chosenCategory = game.categories[choice];
 	}
 }
 
@@ -315,7 +280,7 @@ function chooseAWord(){
 	var choiceFound = false;
 	var i = 0;
 	
-	while(!choiceFound && i < words.length){
+	while(!choiceFound && i < game.words.length){
 		if(mouseX > wordsxy[i].x - 40 && mouseX < wordsxy[i].x + 40 
 		&& mouseY > wordsxy[i].y - 40 && mouseY < wordsxy[i].y + 40){
 			choice = i;
@@ -327,7 +292,7 @@ function chooseAWord(){
 	
 	if(choice != -1){
 		game.scene = 4;
-		chosenWord = words[choice];
+		game.chosenWord = game.words[choice];
 	}
 }
 
@@ -347,14 +312,14 @@ function answerAQuestion(){
 	}
 	
 	if(choice != -1){
-		if(choice == questions[currentQuestion].answer){
+		if(choice == game.questions[currentQuestion].answer){
 			currentCar++;
 		}else{
 			currentCar = currentCar == 0 ? 0 : currentCar - 1;
 		}
 		currentQuestion++;
 		
-		if(currentQuestion == questions.length){
+		if(currentQuestion == game.questions.length){
 			game.scene = 6;
 		}
 	}
