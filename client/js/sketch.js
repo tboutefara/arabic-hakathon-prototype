@@ -10,11 +10,16 @@ let buttons = [];
 let questionxy = [];
 let carxy = [];
 let currentQuestion = 0;
-let currentCar = 0;
+let currentCar = 2;
 let playerCarX = 20;
-let playerCarSpeed = 10;
+let playerCarSpeed = 2;
 let aiCarX = 50;
-let aiCarSpeed = 10;
+let aiCarSpeed = 2;
+let battlewordsxy = [];
+let battlewordsaixy = [];
+let movingWord = -1;
+let oldMouseX;
+let oldMouseY;
 
 
 function preload(){
@@ -50,7 +55,7 @@ function draw() {
   }else if(game.scene == 7){
   	  drawThirdScene();
   }else {
-  	  game.scene = 1;
+  	  // game.scene = 1;
   }
 }
 
@@ -109,7 +114,11 @@ function prepareFirstScene(){
 	let x = 100;
 	let y = 610;
 	
-	for(var i = 0; i < 3; i++){
+	let rows = game.words.length / 3 - 1;
+	console.log(game.words.length);
+	console.log(rows);
+	
+	for(var i = 0; i < rows; i++){
 		for(var j = 0; j < 3; j++){
 			wordsxy[3 * i + j] = {"x" : x + random(150) + j * 200, "y" : y + random(50)};
 		}
@@ -118,7 +127,6 @@ function prepareFirstScene(){
 	}
 	
 	frameRate(12);
-	loadWords(game);
 	game.scene = 3;
 }
 
@@ -133,9 +141,11 @@ function drawFirstScene(){
 	textSize(36);
 	imageMode(CENTER);
 	
-	for(var i = 0; i < 3; i++){
+	let rows = game.words.length / 3 - 1;
+	
+	for(var i = 0; i < rows; i++){
 		for(var j = 0; j < 3; j++){
-			text(game.words[3 * i + j], wordsxy[3 * i + j].x, wordsxy[3 * i + j].y);
+			text(game.words[3 * i + j].word, wordsxy[3 * i + j].x, wordsxy[3 * i + j].y);
 			image(bubble, wordsxy[3 * i + j].x, wordsxy[3 * i + j].y - 10, 120, 120);
 			
 			wordsxy[3 * i + j].y -= 5;
@@ -148,21 +158,20 @@ function prepareSecondScene(){
 	let y = 250;
 	
 	questionxy[0] = {"x" : x, "y" : y};
-	y += 100;
+	y += 50;
 	for(var i = 0; i < 3; i++){
 		questionxy[i + 1] = {"x" : x, "y" : y};
-		y += 50;
+		y += 100;
 	}
 	
-	x = 25;
+	x = 90;
 	y = 470;
 	
-	for(var i = 0; i < 7; i++){
+	for(var i = 0; i < 5; i++){
 		carxy[i] = {"x" : x, "y" : y};
 		x += 130;
 	}
 	
-	loadQuestions(game);
 	game.scene = 5;
 }
 
@@ -176,7 +185,7 @@ function drawSecondScene(){
 	
 	textSize(48);
 	textAlign(CENTER);
-	text(game.chosenWord, 400, 175);	
+	text(game.chosenWord.word, 400, 175);	
 	
 	textSize(28);
 	textAlign(CENTER);
@@ -184,10 +193,11 @@ function drawSecondScene(){
 	
 	stroke(0, 50, 255);
 	strokeWeight(4);
-	for(var i = 0; i < 3; i++){
+	for(var i = 0; i < 2; i++){
+		let q = cleanExplanation(game.questions[currentQuestion].choices[i]);
 		if(mouseX > questionxy[i + 1].x - 100 && mouseX < questionxy[i + 1].x + 100 
 		&& mouseY > questionxy[i + 1].y - 40 && mouseY < questionxy[i + 1].y){
-			rect(questionxy[i + 1].x - 100, questionxy[i + 1].y - 30, 200, 50); // The added or subbed values are to align
+			rect(questionxy[i + 1].x - textWidth(q) / 2, questionxy[i + 1].y - 30, textWidth(q), 50); // The added or subbed values are to align
 		}
 	}
 	stroke(0);
@@ -195,8 +205,9 @@ function drawSecondScene(){
 	
 	textSize(24);
 	textAlign(CENTER);
-	for(var i = 0; i < 3; i++){
-		text(game.questions[currentQuestion].choices[i], questionxy[i + 1].x, questionxy[i + 1].y);
+	for(var i = 0; i < 2; i++){
+		let q = cleanExplanation(game.questions[currentQuestion].choices[i]);
+		text(q, questionxy[i + 1].x, questionxy[i + 1].y);
 	}
 	
 	stroke(0, 255, 50);
@@ -206,13 +217,29 @@ function drawSecondScene(){
 	strokeWeight(0);
 	
 	imageMode(CORNER);
-	for(var i = 0; i < 6; i++){
+	for(var i = 0; i < 5; i++){
 		image(cars[i], carxy[i].x, carxy[i].y, 100, 60);
 	}
 	
 }
 
 function prepareThirdScene(){
+	x = 90;
+	y = 160;
+	
+	for(var i = 0; i < 6; i++){
+		battlewordsxy[i] = {
+			"x" : parseInt(x + Math.random() * 220), 
+			"y" : parseInt(y + Math.random() * 180)
+		};
+		
+		battlewordsaixy[i] = {
+			"x" : parseInt(x + 400 + Math.random() * 220), 
+			"y" : parseInt(y + Math.random() * 180)
+		};
+		
+	}
+	
 	game.scene = 7;
 }
 
@@ -239,6 +266,58 @@ function drawThirdScene(){
 	
 	image(cars[0], aiCarX, 490, 100, 60);
 	image(cars[currentCar], playerCarX, 510, 100, 60);
+	
+	textSize(24);
+	rectMode(CENTER);
+	
+	if(movingWord != -1){
+		battlewordsxy[movingWord].x += (mouseX - oldMouseX);
+		battlewordsxy[movingWord].y += (mouseY - oldMouseY);
+	}
+	
+	oldMouseX = mouseX;
+	oldMouseY = mouseY;
+	
+	for(var i = 0; i < 3; i++){
+		strokeWeight(2);
+		stroke(0, 100, 255);
+		rect(battlewordsxy[2 * i].x, battlewordsxy[2 * i].y - 10, 80, 40);
+		strokeWeight(0);
+		text(game.battleWords.related[i], battlewordsxy[2 * i].x, battlewordsxy[2 * i].y);
+		strokeWeight(2);
+		stroke(0, 100, 255);
+		rect(battlewordsaixy[2 * i].x, battlewordsaixy[2 * i].y - 10, 80, 40);
+		strokeWeight(0);
+		text(game.battleWords.related[i], battlewordsaixy[2 * i].x, battlewordsaixy[2 * i].y);
+		strokeWeight(2);
+		stroke(0, 100, 255);
+		rect(battlewordsxy[2 * i + 1].x, battlewordsxy[2 * i + 1].y - 10, 80, 40);
+		strokeWeight(0);
+		text(game.battleWords.unrelated[i], battlewordsxy[2 * i + 1].x, battlewordsxy[2 * i + 1].y);
+		strokeWeight(2);
+		stroke(0, 100, 255);
+		rect(battlewordsaixy[2 * i + 1].x, battlewordsaixy[2 * i + 1].y - 10, 80, 40);
+		strokeWeight(0);
+		text(game.battleWords.unrelated[i], battlewordsaixy[2 * i + 1].x, battlewordsaixy[2 * i + 1].y);
+			
+	}
+	
+	strokeWeight(2);
+	stroke(0);
+	line(20, 400, 20, 470);
+	line(20, 470, 190, 470);
+	line(190, 470, 190, 400);
+	line(210, 400, 210, 470);
+	line(210, 470, 380, 470);
+	line(380, 470, 380, 400);
+	line(420, 400, 420, 470);
+	line(420, 470, 590, 470);
+	line(590, 470, 590, 400);
+	line(620, 400, 620, 470);
+	line(620, 470, 780, 470);
+	line(780, 470, 780, 400);
+	strokeWeight(0);
+	
 	
 	aiCarX = aiCarX >= 720 ? aiCarX : aiCarX + aiCarSpeed;
 	playerCarX = playerCarX >= 690 ? playerCarX : playerCarX + playerCarSpeed;
@@ -270,8 +349,9 @@ function chooseACategory(){
 	}
 	
 	if(choice != -1){
-		game.scene = 2;
+		game.scene = -1;
 		game.chosenCategory = game.categories[choice];
+		loadWords(game);
 	}
 }
 
@@ -291,8 +371,10 @@ function chooseAWord(){
 	}
 	
 	if(choice != -1){
-		game.scene = 4;
+		game.scene = -1;
 		game.chosenWord = game.words[choice];
+		game.chosenWordIndex = choice;
+		loadQuestions(game);
 	}
 }
 
@@ -301,7 +383,7 @@ function answerAQuestion(){
 	var choiceFound = false;
 	var i = 0;
 	
-	while(!choiceFound && i < 3){ // We always have 3 choices, if changed, this value must be updated
+	while(!choiceFound && i < 2){ // We always have 2 choices, if changed, this value must be updated
 		if(mouseX > questionxy[i + 1].x - 100 && mouseX < questionxy[i + 1].x + 100 // We suppose
 		&& mouseY > questionxy[i + 1].y - 40 && mouseY < questionxy[i + 1].y){
 			choice = i;
@@ -320,7 +402,55 @@ function answerAQuestion(){
 		currentQuestion++;
 		
 		if(currentQuestion == game.questions.length){
-			game.scene = 6;
+			game.scene = -1;
+			loadBattleWords(game);
 		}
 	}
 }
+
+function mousePressed(){
+	if(game.scene == 7){
+		if(movingWord == -1){
+			for(var i = 5; i >= 0; i--){
+				if(mouseX > battlewordsxy[i].x - 40 && mouseX < battlewordsxy[i].x + 40 
+				&& mouseY > battlewordsxy[i].y - 35 && mouseY < battlewordsxy[i].y + 15){
+					movingWord = i;
+					break;
+				}
+			}
+		}
+	}
+}
+
+function mouseReleased(){
+	
+	if(game.scene == 7 && movingWord != -1){
+		if(movingWord % 2 == 0){
+			if(battlewordsxy[movingWord].x > 60 && battlewordsxy[movingWord].x < 150 &&
+			   battlewordsxy[movingWord].y > 400 && battlewordsxy[movingWord].y < 450){
+				   playerCarSpeed = (playerCarSpeed == 6) ? 6 : playerCarSpeed + 1;
+			}
+			
+			if(battlewordsxy[movingWord].x > 250 && battlewordsxy[movingWord].x < 340 &&
+			   battlewordsxy[movingWord].y > 400 && battlewordsxy[movingWord].y < 450){
+				   playerCarSpeed = (playerCarSpeed == 0) ? 0 : playerCarSpeed - 1;
+			}
+		}
+		
+		if(movingWord % 2 == 1){
+			if(battlewordsxy[movingWord].x > 250 && battlewordsxy[movingWord].x < 340 &&
+			   battlewordsxy[movingWord].y > 400 && battlewordsxy[movingWord].y < 450){
+				   playerCarSpeed = (playerCarSpeed == 6) ? 6 : playerCarSpeed + 1;
+			}
+			
+			if(battlewordsxy[movingWord].x > 60 && battlewordsxy[movingWord].x < 150 &&
+			   battlewordsxy[movingWord].y > 400 && battlewordsxy[movingWord].y < 450){
+				   playerCarSpeed = (playerCarSpeed == 0) ? 0 : playerCarSpeed - 1;
+			}
+		}
+	}
+	
+	movingWord = -1;
+}
+		
+	

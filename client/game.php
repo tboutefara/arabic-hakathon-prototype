@@ -20,6 +20,7 @@
   </script>
   <script src="./js/p5.min.js"></script>
   <script src="./js/sketch.js"></script>
+  <script src="./js/tools.js"></script>
   <script src="./js/jquery.min.js"></script>
 </head>
 
